@@ -1,17 +1,21 @@
 parameters:
-  - name: azureServiceConnection
-    type: string
-  - name: location
-    type: string
-    default: 'australiaeast'
-    type: string
-  - name: parametersFile
+- name: azureServiceConnection
+  type: string
+
+- name: location
+  type: string
+  default: 'australiaeast'
+
+- name: parametersFile
+  type: string
+
 
 jobs:
 - job: WhatIf
   displayName: What-If Bicep
   pool:
     vmImage: 'ubuntu-latest'
+
   steps:
   - task: AzureCLI@2
     displayName: 'Run What-If for Bicep deployment (subscription)'
@@ -21,5 +25,10 @@ jobs:
       scriptLocation: inlineScript
       inlineScript: |
         set -euo pipefail
-        echo "Running subscription what-if"
-        az deployment sub what-if --location "${{ parameters.location }}" --template-file "${{ parameters.bicepFile }}" --parameters @"${{ parameters.parametersFile }}" --no-prompt
+
+        echo "Running subscription what-if..."
+
+        az deployment sub what-if \
+          --location "${{ parameters.location }}" \
+          --parameters "${{ parameters.parametersFile }}" \
+          --no-prompt
