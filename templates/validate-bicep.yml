@@ -8,6 +8,7 @@ parameters:
   - name: parametersFile
     type: string
 
+
 jobs:
 - job: Validate
   displayName: 'Validate Subscription Deployment'
@@ -22,12 +23,12 @@ jobs:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        set -e
+        set -euo pipefail
 
-        echo "Building Bicep to verify syntax"
+        echo "Building Bicep to verify syntax..."
         az bicep build --file JHG/infrastructure/main.bicep
 
-        echo "Validating deployment (subscription scope)"
+        echo "Validating deployment (subscription scope)..."
         az deployment sub validate \
-          --location ${{ parameters.location }} \
-          --parameters ${{ parameters.parametersFile }}
+          --location "${{ parameters.location }}" \
+          --parameters "${{ parameters.parametersFile }}"
