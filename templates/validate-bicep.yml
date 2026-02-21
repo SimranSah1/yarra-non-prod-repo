@@ -1,29 +1,35 @@
 parameters:
-  - name: azureServiceConnection
-    type: string
-  - name: location
-    type: string
-    default: 'australiaeast'
-  - name: bicepFile
-    type: string
-  - name: parametersFile
-    type: string
+- name: azureServiceConnection
+  type: string
+- name: location
+  type: string
+  default: 'australiaeast'
+- name: bicepFile
+  type: string
+- name: parametersFile
+  type: string
 
 jobs:
 - job: Validate
   displayName: Validate Bicep
   pool:
     vmImage: 'ubuntu-latest'
+
   steps:
   - task: AzureCLI@2
-      displayName: 'Validate Bicep template (subscription)'
+    displayName: 'Validate Bicep template (subscription)'
     inputs:
       azureSubscription: ${{ parameters.azureServiceConnection }}
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
         set -euo pipefail
+
         echo "Building Bicep to verify syntax"
         az bicep build --file "${{ parameters.bicepFile }}"
+
         echo "Validating deployment (subscription scope)"
-        az deployment sub validate --location "${{ parameters.location }}" --template-file "${{ parameters.bicepFile }}" --parameters @"${{ parameters.parametersFile }}"
+        az deployment sub validate \
+          --location "${{ parameters.location }}" \
+          --template-file "${{ parameters.bicepFile }}" \
+          --parameters @"${{ parameters.parametersFile }}"
