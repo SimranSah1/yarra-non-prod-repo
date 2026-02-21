@@ -1,0 +1,38 @@
+parameters:
+  - name: azureServiceConnection
+    type: string
+  - name: location
+    type: string
+    default: 'australiaeast'
+  - name: bicepFile
+    type: string
+  - name: parametersFile
+
+jobs:
+- job: Deploy
+  displayName: Deploy Bicep
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: AzureKeyVault@2
+    displayName: 'Fetch secrets from Key Vault'
+    inputs:
+      azureSubscription: ${{ parameters.azureServiceConnection }}
+      KeyVaultName: 'eam-sec-tst-ae-kv'
+      SecretsFilter: 'sqlMiAdminPassword'
+      RunnerDebugFlag: false
+
+  - task: AzureCLI@2
+    displayName: 'Deploy Bicep template (subscription)'
+    inputs:
+      azureSubscription: ${{ parameters.azureServiceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -euo pipefail
+        echo "Creating/updating resources at subscription scope"
+        az deployment sub create \
+          --location "${{ parameters.location }}" \
+          --template-file "${{ parameters.bicepFile }}" \
+          --parameters @"${{ parameters.parametersFile }}" \
+          sqlMiAdminPassword="$(sqlMiAdminPassword)"
