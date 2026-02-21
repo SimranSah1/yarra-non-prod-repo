@@ -49,8 +49,7 @@
 #     - template: templates/validate-bicep.yml
 #       parameters:
 #         azureServiceConnection: '$(azureServiceConnection)'
-#         location: '$(location)'
-#         bicepFile: 'JHG/infrastructure/main.bicep'
+#         location: '$(location)'        
 #         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
 
 # - stage: WhatIf
@@ -60,8 +59,7 @@
 #     - template: templates/whatif-bicep.yml
 #       parameters:
 #         azureServiceConnection: '$(azureServiceConnection)'
-#         location: '$(location)'
-#         bicepFile: 'JHG/infrastructure/main.bicep'
+#         location: '$(location)'      
 #         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
 
 # - stage: Deploy
@@ -71,8 +69,7 @@
 #     - template: templates/deploy-bicep.yml
 #       parameters:
 #         azureServiceConnection: '$(azureServiceConnection)'
-#         location: '$(location)'
-#         bicepFile: 'JHG/infrastructure/main.bicep'
+#         location: '$(location)'    
 #         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
 trigger:
   branches:
@@ -141,8 +138,7 @@ stages:
     - template: ../templates/validate-bicep.yml
       parameters:
         azureServiceConnection: '$(azureServiceConnection)'
-        location: '$(location)'
-        bicepFile: 'JHG/infrastructure/main.bicep'
+        location: '$(location)'    
         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
 
 
@@ -156,8 +152,7 @@ stages:
     - template: ../templates/whatif-bicep.yml
       parameters:
         azureServiceConnection: '$(azureServiceConnection)'
-        location: '$(location)'
-        bicepFile: 'JHG/infrastructure/main.bicep'
+        location: '$(location)'   
         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
 
 
@@ -172,5 +167,4 @@ stages:
       parameters:
         azureServiceConnection: '$(azureServiceConnection)'
         location: '$(location)'
-        bicepFile: 'JHG/infrastructure/main.bicep'
         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
