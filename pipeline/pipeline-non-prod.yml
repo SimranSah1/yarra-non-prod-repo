@@ -5,16 +5,19 @@ trigger:
 
 variables:
   - name: azureServiceConnection
-    value: 'EAM-NonProd-SC' # example: replace with your Azure DevOps service connection name
+    value: 'EAM-NonProd-SC'
   - name: resourceGroup
-    value: 'network-zones-tst-yt-rg' # example: the networking non-prod resource group
+    value: 'network-zones-tst-yt-rg'
   - name: appResourceGroup
     value: 'eam-app-tst-ae-rg'
+  - name: keyVaultName
+    value: 'eam-sec-tst-ae-kv'
   - name: location
     value: 'australiaeast'
 
+stages:
 - stage: Preflight
-  displayName: Preflight: verify resource groups
+  displayName: 'Preflight: Verify Resource Groups'
   jobs:
     - job: CheckRGs
       displayName: 'Check resource groups exist'
@@ -39,9 +42,9 @@ variables:
             done
             echo "All resource groups exist."
 
-stages:
 - stage: Validate
-  displayName: Validate Bicep (non-prod)
+  displayName: 'Validate Bicep (non-prod)'
+  dependsOn: Preflight
   jobs:
     - template: templates/validate-bicep.yml
       parameters:
@@ -51,7 +54,7 @@ stages:
         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
 
 - stage: WhatIf
-  displayName: WhatIf Bicep (non-prod)
+  displayName: 'WhatIf Bicep (non-prod)'
   dependsOn: Validate
   jobs:
     - template: templates/whatif-bicep.yml
@@ -62,7 +65,7 @@ stages:
         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
 
 - stage: Deploy
-  displayName: Deploy Bicep (non-prod)
+  displayName: 'Deploy Bicep (non-prod)'
   dependsOn: WhatIf
   jobs:
     - template: templates/deploy-bicep.yml
