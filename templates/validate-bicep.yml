@@ -1,29 +1,33 @@
 parameters:
-- name: azureServiceConnection
-  type: string
-- name: location
-  type: string
-- name: parametersFile
-  type: string
+  - name: azureServiceConnection
+    type: string
+
+  - name: location
+    type: string
+
+  - name: parametersFile
+    type: string
 
 jobs:
 - job: Validate
-  displayName: Validate Bicep
+  displayName: 'Validate Subscription Deployment'
   pool:
     vmImage: 'ubuntu-latest'
 
   steps:
   - task: AzureCLI@2
-    displayName: 'Validate Bicep using bicepparam'
+    displayName: 'Validate Bicep'
     inputs:
       azureSubscription: ${{ parameters.azureServiceConnection }}
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        set -euo pipefail
+        set -e
 
-        echo "Running subscription-level validation using bicepparam"
+        echo "Building Bicep to verify syntax"
+        az bicep build --file JHG/infrastructure/main.bicep
 
+        echo "Validating deployment (subscription scope)"
         az deployment sub validate \
-          --location "${{ parameters.location }}" \
-          --parameters "${{ parameters.parametersFile }}"
+          --location ${{ parameters.location }} \
+          --parameters ${{ parameters.parametersFile }}
