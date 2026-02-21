@@ -3,7 +3,6 @@ parameters:
   type: string
 - name: location
   type: string
-  default: 'australiaeast'
 - name: parametersFile
   type: string
 
@@ -15,7 +14,7 @@ jobs:
 
   steps:
   - task: AzureCLI@2
-    displayName: 'Validate Bicep template (subscription)'
+    displayName: 'Validate Bicep using bicepparam'
     inputs:
       azureSubscription: ${{ parameters.azureServiceConnection }}
       scriptType: bash
@@ -23,7 +22,7 @@ jobs:
       inlineScript: |
         set -euo pipefail
 
-        echo "Validating deployment using bicepparam file"
+        echo "Running subscription-level validation using bicepparam"
 
         az deployment sub validate \
           --location "${{ parameters.location }}" \
