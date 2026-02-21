@@ -4,7 +4,6 @@ parameters:
   - name: location
     type: string
     default: 'australiaeast'
-  - name: bicepFile
     type: string
   - name: parametersFile
 
