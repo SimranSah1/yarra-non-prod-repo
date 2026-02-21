@@ -1,3 +1,79 @@
+# trigger:
+#   branches:
+#     include:
+#       - main
+
+# variables:
+#   - name: azureServiceConnection
+#     value: 'EAM-NonProd-SC'
+#   - name: resourceGroup
+#     value: 'network-zones-tst-yt-rg'
+#   - name: appResourceGroup
+#     value: 'eam-app-tst-ae-rg'
+#   - name: keyVaultName
+#     value: 'eam-sec-tst-ae-kv'
+#   - name: location
+#     value: 'australiaeast'
+
+# stages:
+# - stage: Preflight
+#   displayName: 'Preflight: Verify Resource Groups'
+#   jobs:
+#     - job: CheckRGs
+#       displayName: 'Check resource groups exist'
+#       pool:
+#         vmImage: 'ubuntu-latest'
+#       steps:
+#       - task: AzureCLI@2
+#         displayName: 'Verify required resource groups'
+#         inputs:
+#           azureSubscription: '$(azureServiceConnection)'
+#           scriptType: bash
+#           scriptLocation: inlineScript
+#           inlineScript: |
+#             set -euo pipefail
+#             echo "Checking resource groups..."
+#             for rg in '$(resourceGroup)' '$(appResourceGroup)'; do
+#               echo "Checking $rg"
+#               if ! az group show --name "$rg" >/dev/null 2>&1; then
+#                 echo "Resource group $rg not found. Exiting."
+#                 exit 1
+#               fi
+#             done
+#             echo "All resource groups exist."
+
+# - stage: Validate
+#   displayName: 'Validate Bicep (non-prod)'
+#   dependsOn: Preflight
+#   jobs:
+#     - template: templates/validate-bicep.yml
+#       parameters:
+#         azureServiceConnection: '$(azureServiceConnection)'
+#         location: '$(location)'
+#         bicepFile: 'JHG/infrastructure/main.bicep'
+#         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
+
+# - stage: WhatIf
+#   displayName: 'WhatIf Bicep (non-prod)'
+#   dependsOn: Validate
+#   jobs:
+#     - template: templates/whatif-bicep.yml
+#       parameters:
+#         azureServiceConnection: '$(azureServiceConnection)'
+#         location: '$(location)'
+#         bicepFile: 'JHG/infrastructure/main.bicep'
+#         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
+
+# - stage: Deploy
+#   displayName: 'Deploy Bicep (non-prod)'
+#   dependsOn: WhatIf
+#   jobs:
+#     - template: templates/deploy-bicep.yml
+#       parameters:
+#         azureServiceConnection: '$(azureServiceConnection)'
+#         location: '$(location)'
+#         bicepFile: 'JHG/infrastructure/main.bicep'
+#         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
 trigger:
   branches:
     include:
@@ -6,16 +82,25 @@ trigger:
 variables:
   - name: azureServiceConnection
     value: 'EAM-NonProd-SC'
+
   - name: resourceGroup
     value: 'network-zones-tst-yt-rg'
+
   - name: appResourceGroup
     value: 'eam-app-tst-ae-rg'
+
   - name: keyVaultName
     value: 'eam-sec-tst-ae-kv'
+
   - name: location
     value: 'australiaeast'
 
+
 stages:
+
+# =========================
+# 1️⃣ Preflight Stage
+# =========================
 - stage: Preflight
   displayName: 'Preflight: Verify Resource Groups'
   jobs:
@@ -23,6 +108,7 @@ stages:
       displayName: 'Check resource groups exist'
       pool:
         vmImage: 'ubuntu-latest'
+
       steps:
       - task: AzureCLI@2
         displayName: 'Verify required resource groups'
@@ -33,6 +119,7 @@ stages:
           inlineScript: |
             set -euo pipefail
             echo "Checking resource groups..."
+
             for rg in '$(resourceGroup)' '$(appResourceGroup)'; do
               echo "Checking $rg"
               if ! az group show --name "$rg" >/dev/null 2>&1; then
@@ -40,35 +127,48 @@ stages:
                 exit 1
               fi
             done
+
             echo "All resource groups exist."
 
+
+# =========================
+# 2️⃣ Validate Stage
+# =========================
 - stage: Validate
   displayName: 'Validate Bicep (non-prod)'
   dependsOn: Preflight
   jobs:
-    - template: templates/validate-bicep.yml
+    - template: ../templates/validate-bicep.yml
       parameters:
         azureServiceConnection: '$(azureServiceConnection)'
         location: '$(location)'
         bicepFile: 'JHG/infrastructure/main.bicep'
         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
 
+
+# =========================
+# 3️⃣ WhatIf Stage
+# =========================
 - stage: WhatIf
   displayName: 'WhatIf Bicep (non-prod)'
   dependsOn: Validate
   jobs:
-    - template: templates/whatif-bicep.yml
+    - template: ../templates/whatif-bicep.yml
       parameters:
         azureServiceConnection: '$(azureServiceConnection)'
         location: '$(location)'
         bicepFile: 'JHG/infrastructure/main.bicep'
         parametersFile: 'JHG/infrastructure/environments/non-prod/main.non-prod.bicepparam'
 
+
+# =========================
+# 4️⃣ Deploy Stage
+# =========================
 - stage: Deploy
   displayName: 'Deploy Bicep (non-prod)'
   dependsOn: WhatIf
   jobs:
-    - template: templates/deploy-bicep.yml
+    - template: ../templates/deploy-bicep.yml
       parameters:
         azureServiceConnection: '$(azureServiceConnection)'
         location: '$(location)'
