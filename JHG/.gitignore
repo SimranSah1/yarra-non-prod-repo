@@ -1,0 +1,10 @@
+# Gitignore for Azure Infrastructure project
+*.log
+*.tmp
+.DS_Store
+.vscode/
+.idea/
+*.user
+bin/
+obj/
+.azure/
